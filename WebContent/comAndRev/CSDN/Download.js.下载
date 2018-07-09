@@ -1,0 +1,546 @@
+// download_detail  and  album_detail of download      asdasdasdas
+define(['apps/_verificaUser', 'apps/show', 'apps/hide', 'apps/securityHide'], function (_verificaUser, show, hide, securityHide) {
+    var init;
+    init = function () {
+        var directBtn = $(".direct_download"),
+                dredgevipBtn = $(".open_vip"),
+                downloadBtn = $(".js_download_btn"),
+                vipBtn = $(".vip_download"),
+                //dredgeBtn = $(".dredge_vip"),
+                albumBtn = $(".album_download_btn"),
+                albumDireBtn = $(".album_dl_btn"),
+                albumVipBtn = $(".album_vip_btn"),
+                securityImg = $("#imgValidcode"),
+                dlUrl = "/index.php/source/before_do_download/" + $(".dl_download").attr("data-id"),
+                //jsNeedInte 资源所需积分  source_score
+                //needInteN = $(".jsNeedInte"),
+                needInte = $(".jsNeedInte"),
+                //jsRemainInte 剩余积分    user_score
+                remainInte = $(".jsRemainInte"),
+                remainC = $("jsRemainC"),
+                dlVipUrl = "/index.php/source/get_user_vip/" + $(".dl_download").attr("data-id"),
+                vipDlBtn = $(".js_dl_vip"),
+                dlDownloadId = $(".dl_download").attr("data-id"),
+                dlDownloadUsername = $(".dl_download").attr("data-username"),
+                sourceId = $("#source_id").attr("value"),
+                userName = $("#to_username").attr("value"),
+                sourceScore = $("#re_source_score").attr("value"),
+                base_url = $("#base_url").attr("value"),
+                dl_cdn_URL = (typeof dl_cdn_url === 'undefined') ? '//csdnimg.cn/release/download' : dl_cdn_url;
+
+        if (typeof noCaptcha == 'undefined') {
+            return;
+        } else {
+            var nc = new noCaptcha();
+            var nc_appkey = 'FFFF00000000016C467E';  // 应用标识,不可更改
+            var nc_scene = 'other';  //场景,不可更改
+            var nc_token = [nc_appkey, (new Date()).getTime(), Math.random()].join(':');
+            var nc_option = {
+                renderTo: '#dom_id', //渲染到该DOM ID指定的Div位置
+                appkey: nc_appkey,
+                scene: nc_scene,
+                token: nc_token,
+                callback: function (data) {// 校验成功回调
+                    console.log(data.csessionid);
+                    console.log(data.sig);
+                    console.log(nc_token);
+
+                    document.getElementById('csessionid').value = data.csessionid;
+                    document.getElementById('sig').value = data.sig;
+                    document.getElementById('token').value = nc_token;
+                    document.getElementById('scene').value = nc_scene;
+                }
+            };
+            nc.init(nc_option);
+        }
+
+
+        $(".pop_close,.dl_btn,.dl_btn_red,.album_dl_btn,.album_vip_btn").on("click", function (event) {
+            hide.hide(".dl_popup");
+            $(".report_img").each(function () {
+                $(this).remove();
+            });
+            event.stopPropagation();
+        });
+
+
+        dredgevipBtn.each(function () {
+            $(this).on("click", function (event) {
+                //if(_verificaUser._verificaUser()){
+                $(this).attr('href', "/vip_code").attr('target', '_blank');
+                //}
+            });
+        });
+        function loginbox() {
+            var $logpop = $("#loginWrap");
+            $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://download.csdn.net/static/dist/html/callback.html&from=http://download.csdn.net/download/' + dlDownloadUsername + '/' + dlDownloadId + '" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+            //$logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service='+dl_cdn_URL+'/html/callback.html&from='+base_url+'/download/'+dlDownloadUsername+'/'+dlDownloadId+'" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+            show.show("#dlMask");
+            show.show("#loginWrap");
+
+            $('#dlMask').unbind("click");
+            $('#dlMask').bind("click", function () {
+                $('#dlMask').hide();
+                var $clopop = $("#loginWrap");
+
+                setTimeout(function () {
+                    $clopop.hide();
+                }, 200);
+                return false;
+            });
+
+        }
+        //直接下载按钮
+        directBtn.each(function () {
+            $(this).on("click", function (event) {
+                //if(_verificaUser._verificaUser()){
+                $("#source_id").attr("value", dlDownloadId);
+                $("#to_username").attr("value", dlDownloadUsername);
+                $.ajax({
+                    type: 'get',
+                    url: dlUrl,
+                    async: false,
+                    dataType: 'jsonp',
+                    jsonpcallback: 'jsonpcallback',
+                    success: function (resobj) {
+                        //未登录
+                        if (resobj.succ == 2011) {
+                            loginbox();
+                        }
+                        //4、积分和C币都不足
+                        else if (resobj.succ == 2006) {
+                            var noVipNoEnoughPNoC = $("#noVipNoEnoughPNoC");
+
+                            show.show("#noVipNoEnoughPNoC");
+                            $("#noVipNoEnoughPNoC .resource_title h3").text(resobj.title);
+                            noVipNoEnoughPNoC.find(".jsNeedInte").html(resobj.source_score);
+                            noVipNoEnoughPNoC.find(".jsRemainInte").html(resobj.user_score);
+                            noVipNoEnoughPNoC.find(".jsRemainC").html(resobj.c_score);
+                            noVipNoEnoughPNoC.find(".noC span").html(resobj.msg);
+                            noVipNoEnoughPNoC.find(".noCmsg_up span").html(resobj.msg_up);
+                            noVipNoEnoughPNoC.find(".resource_img img").attr('src', resobj.image);
+
+                            _hmt.push(['_setAutoPageview', false]);
+                            _hmt.push(['_trackPageview', '/down_click_nocredit/' + userName + '/' + sourceId]);
+                            var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=down_click_nocredit&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+                            $("#noVipNoEnoughPNoC").append(imgHtml);
+                        }
+                        //5、积分不足,但有c币
+                        else if (resobj.succ == 2007) {
+                            var noVipNoEnoughPHasC = $("#noVipNoEnoughPHasC");
+                            show.show("#noVipNoEnoughPHasC");
+                            $("#noVipNoEnoughPHasC .resource_title h3").text(resobj.title);
+                            noVipNoEnoughPHasC.find(".jsNeedInte").html(resobj.source_score);
+                            noVipNoEnoughPHasC.find(".jsRemainInte").html(resobj.user_score);
+                            noVipNoEnoughPHasC.find(".jsRemainC").html(resobj.c_score);
+                            noVipNoEnoughPHasC.find(".noC .cWrap").html(resobj.reduce_c_score);
+                            noVipNoEnoughPHasC.find(".resource_img img").attr('src', resobj.image);
+                            noVipNoEnoughPHasC.find(".js_download_btn").attr("data-href", resobj.actionUrl);
+                            _hmt.push(['_setAutoPageview', false]);
+                            _hmt.push(['_trackPageview', '/down_click_nocredit/' + userName + '/' + sourceId]);
+                            var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=down_click_nocredit&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+                            $("#noVipNoEnoughPHasC").append(imgHtml);
+                        } else if (resobj.succ == 2001) {
+                            window.location = resobj.actionUrl;
+                            hide.hide(".dl_popup");
+                        }
+
+                        //1.0积分下载
+                        else if (resobj.succ == 2004) {
+                            show.show("#noVipZeroP");
+
+                            var noVipZeroP = $("#noVipZeroP");
+                            $('#noVipZeroP .resource_dl_btn').find('a').hide();
+                            $('#noVipZeroP #download_code').val('');
+                            $('#noVipZeroP .download_code_err').html('');
+                            $("#noVipZeroP .resource_title h3").text(resobj.title);
+                            noVipZeroP.find(".jsNeedInte").html(resobj.source_score);
+                            noVipZeroP.find(".jsRemainInte").html(resobj.user_score);
+                            noVipZeroP.find(".jsRemainC").html(resobj.c_score);
+                            //需要添加一个image
+                            $("#noVipZeroP").find(".resource_img img").attr('src', resobj.image);
+                            $("#noVipZeroP").find(".js_download_btn").attr("data-href", resobj.actionUrl);
+                        }
+                        //2.vip下载
+                        else if (resobj.succ == 2005) {
+                            show.show("#vipIgnoreP");
+                            $("#vipIgnoreP .resource_title h3").text(resobj.title);
+                            //$("#vipIgnoreP .resource_title h3").text(resobj.title);
+                            //download_num    end_time
+                            //需要添加一个image
+                            //resource_img
+                            downloadBtn.attr("data-href", resobj.actionUrl);
+                            $('#vip_btn').attr('href', base_url + "index.php/vip_download/download_client/" + $(".dl_download").attr("data-id"))
+
+                        }
+
+                        //24小时内下载次数超过20次
+                        else if (resobj.succ == 2022) {
+                            show.show("#download_times");
+                        }
+
+                        //3.非VIP,需积分下载且积分足够
+                        else if (resobj.succ == 2002) {
+                            var noVipEnoughP = $("#noVipEnoughP");
+                            show.show("#noVipEnoughP");
+                            $("#noVipEnoughP .resource_title h3").text(resobj.title);
+                            noVipEnoughP.find(".jsNeedInte").html(resobj.source_score);
+                            noVipEnoughP.find(".jsRemainInte").html(resobj.user_score);
+                            noVipEnoughP.find(".jsRemainC").html(resobj.c_score);
+                            noVipEnoughP.find(".resource_img img").attr('src', resobj.image);
+
+                            var dlResNm = parseInt(Math.ceil(resobj.user_score / resobj.source_score));
+                            $(".inte_tips").html("(仅够下载" + dlResNm + "个资源)");
+                            noVipEnoughP.find(".js_download_btn").attr("data-href", resobj.actionUrl);
+                            _hmt.push(['_setAutoPageview', false]);
+                            _hmt.push(['_trackPageview', '/down_click_credit/' + userName + '/' + sourceId]);
+                            var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=down_click_credit&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+                            $("#noVipEnoughP").append(imgHtml);
+                        } else if (resobj.succ == 2013) {
+                            show.show("#dl_lock");
+                            $("#dl_lock").find(".sec_pop_t").html(resobj.msg);
+                        }
+                        //已经下载过该资源且已评论过，不再扣除积分的弹框
+                        else if (resobj.succ == 2003) {
+                            show.show("#download");
+                            $("#download .album_tips").text(resobj.msg);
+                            $("#download").find(".js_download_btn").attr("data-href", resobj.actionUrl);
+                            _hmt.push(['_setAutoPageview', false]);
+                            _hmt.push(['_trackPageview', '/down_click/already/' + userName + '/' + sourceId]);
+                            var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=down_click_already&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+                            $("#download").append(imgHtml);
+                        }
+                        //已下载过且没有评论过，弹出去评论框
+                        else if (resobj.succ == 1000) {
+                            show.show("#dl_lock");
+                            //$("#download .album_tips").text(resobj.msg);
+                            $("#dl_lock .sec_pop_t").html('您已经下载过该资源，还没有评论过，评论过您的使用感受后可再次下载哦~<a class="goComment" href="#comment" target="_blank"> 去评论</a>。');
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+                //}
+                //event.stopPropagation();
+            });
+        });
+        //直接下载且积分足够,弹层
+        downloadBtn.on("click", function (event) {
+
+            var url = $(this).attr("data-href");
+            $.ajax({
+                type: 'get',
+                url: url,
+                async: false,
+                dataType: 'jsonp',
+                jsonpcallback: 'jsonpcallback',
+                success: function (resobj) {
+                    if (resobj.succ == 2031) {
+                        show.show("#vip_album");
+                        $("#vip_album .album_tips").text(resobj.msg);
+                    } else if (resobj.succ == 2000) {
+                        window.location = resobj.msg;
+                        hide.hide(".dl_popup");
+                    } else if (resobj.succ == 2021) {
+                        //start
+                        //update 2017年3月22日  yc  bugfix  验证码修复
+                        $('#imgValidcode_dl').click();
+                        //end
+                        show.show("#dl_security_detail");
+                    } else if (resobj.succ == 2022) {
+                        show.show("#download_times");
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+            _hmt.push(['_setAutoPageview', false]);
+            _hmt.push(['_trackPageview', '/do_download/' + userName + '/' + sourceId]);
+            var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=do_download&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+            $("#download").append(imgHtml);
+            event.stopPropagation();
+        });
+
+        //下载详情页面下载过于频繁请输入验证码
+        $('#detail_submit').on("click", function (event) {
+            var source_id = $("#source_id").attr("value");
+            var username = $("#to_username").attr("value");
+            var url = '/index.php/source/check_to_validate/' + source_id + '/' + username + '/to_validate';
+            //var url = '/index.php/source/do_download/' + source_id + '/' + username + '/to_validate';
+            //$('#da').val(validate_code);
+            $("#download_form_checkali").ajaxSubmit({
+                url: url,
+                //dataType:'json',
+                type: 'post',
+                dataType: 'jsonp',
+                jsonpcallback: 'jsonpcallback',
+                success: function (resobj) {
+                    if (resobj.succ == 2000) {
+                        window.location = resobj.msg;
+                        securityHide.securityHide();
+                        hide.hide(".dl_popup");
+                    } else if (resobj.succ == 1012) {
+                        $("#dlMask").show();
+                        $("#dl_security_detail").show();
+                    } else if (resobj.succ == 1031) {
+                        hide.hide("#dl_security");
+                        show.show("#dl_noEnoughJiFen");
+                    } else if (resobj.succ == 2022) {
+                        show.show("#download_times");
+                    }
+                    nc.init(nc_option);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+            event.stopPropagation();
+        });
+
+        //直接下载且积分不够
+        $("#coin_exchange").click(function () {
+            xhr = $('#c_excfrom').ajaxSubmit({
+                dataType: 'json',
+                success: function (datas) {
+                    if (datas.succ == 4)
+                    {
+                        hide.hide(".dl_popup");
+                        show.show("#exchange_succ");
+                        $('#user_score').html(datas.curr_score);
+                        $("#d_score").val("");
+                        $('#c_score').html("0");
+                    } else if (datas.succ == 2) {
+                        $("#tips_wrap").show();
+                    } else if (datas.succ == 1) {
+                        $("#tips_wrap").show();
+                        $("#tips_wrap .tips").text(datas.errmsg);
+                    } else if (datas.succ == 3) {
+                        $("#tips_wrap").show();
+                        $("#tips_wrap .tips").text(datas.errmsg);
+                    } else if (datas.succ == -4) {
+                        $("#tips_wrap").show();
+                        $("#tips_wrap .tips").text(datas.errmsg);
+                    }
+                    //return false;
+                }, error: function () {
+                    console.log("ajax error");
+                }
+
+            });
+        });
+        $("#d_score").on("keyup", function () {
+            var d_score = $(this).val();
+            var res = d_score % 2;
+            if (res != 0 || d_score == 0) {
+                $("#tips_wrap").show();
+                $("#tips_wrap .tips").text("请输入2的倍数！");
+            } else {
+                $('#c_score').html(d_score / 2);
+            }
+
+        });
+
+        //vip下载按钮
+        vipBtn.each(function () {
+            $(this).on("click", function (event) {
+                //这里将来要加接口的
+                // if(_verificaUser._verificaUser()){
+                $.ajax({
+                    type: 'get',
+                    url: dlVipUrl,
+                    async: false,
+                    dataType: 'jsonp',
+                    jsonpcallback: 'jsonpcallback',
+                    success: function (resobj) {
+                        if (resobj.succ == 3012) {
+                            show.show("#vip_album");
+                            $("#vip_album .album_tips").text(resobj.msg);
+                        } else if (resobj.succ == 3013) {
+                            //document.location = resobj.actionUrl;
+                            show.show("#vip_album");
+                            $("#vip_album .album_tips").text(resobj.msg);
+                        } else if (resobj.succ == 3014) {
+                            show.show("#noVip_dl");
+                        } else if (resobj.succ == 3015) {
+                            show.show("#vip_album");
+                            $("#vip_album .album_tips").text(resobj.msg);
+                        } else if (resobj.succ == 3000) {
+                            show.show("#vip_dl");
+                            $("#vip_dl .integral_intro em").text(resobj.rest_down_times);
+                            $("#vip_dl .integral_intro span").text(resobj.useful_life);
+                            vipDlBtn.attr("data-href", resobj.actionUrl);
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+                //}
+                _hmt.push(['_setAutoPageview', false]);
+                _hmt.push(['_trackPageview', '/down_click_vip/' + userName + '/' + sourceId]);
+                var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=down_click_vip&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+                $("#noVipEnoughP").append(imgHtml);
+                event.stopPropagation();
+            });
+        });
+        //vip会员下载
+        vipDlBtn.on("click", function (event) {
+            window.location = vipDlBtn.attr("data-href");
+            event.stopPropagation();
+        });
+        //vip下载弹层
+        $("#vip_btn").on("click", function () {
+            _hmt.push(['_setAutoPageview', false]);
+            _hmt.push(['_trackPageview', '/do_download_vip/' + userName + '/' + sourceId]);
+            var imgHtml = '<img class="report_img" src="/static/dist/images/report.png?type=do_download_vip&username=' + userName + '&sourceId=' + sourceId + '&sourcescore=' + sourceScore + '&v=' + Math.random() + '"/>';
+            $("#vipIgnoreP").append(imgHtml);
+        });
+
+
+
+        //album_detail_download
+        albumBtn.on("click", function (event) {
+            if (_verificaUser._verificaUser()) {
+                show.show("#album_dl");
+                var albumId = $(this).attr("data-id"),
+                        //url = 'http://beta.download.csdn.net/index.php/album/do_download_album/' + albumId + '/' + rhex(albumId);
+                        url = '/index.php/album/do_download_album/' + albumId;
+                //专辑详情页面普通下载
+                albumDireBtn.on("click", function (event) {
+                    $.ajax({
+                        type: 'get',
+                        url: url,
+                        async: false,
+                        dataType: 'jsonp',
+                        jsonpcallback: 'jsonpcallback',
+                        success: function (resobj) {
+                            if (resobj.succ == 1000) {
+                                window.location = resobj.msg;
+                                hide.hide(".dl_popup");
+                            } else if (resobj.succ == 1011) {
+                                show.show("#dl_security");
+                            } else if (resobj.succ == 1021) {
+                                show.show("#dl_lock");
+                            }
+                        },
+                        error: function (err) {
+                            console.log(err);
+                        }
+                    });
+                    event.stopPropagation();
+                });
+
+
+                //专辑详情页面vip免积分下载
+                albumVipBtn.on("click", function (event) {
+                    var url = 'http://download.csdn.net/index.php/album/do_vip_download_album/' + albumId;
+                    $.ajax({
+                        type: 'get',
+                        url: url,
+                        async: false,
+                        dataType: 'jsonp',
+                        jsonpcallback: 'jsonpcallback',
+                        success: function (resobj) {
+                            if (resobj.succ == 1000) {
+                                window.location = resobj.msg;
+                                hide.hide(".dl_popup");
+                            } else if (resobj.succ == 1043 || resobj.succ == 1044) {
+                                show.show("#vip_album");
+                                $("#vip_album .album_renewal").show();
+                                $("#vip_album .album_tips").text(resobj.msg);
+                            } else if (resobj.succ == 1045) {
+                                show.show("#noVip_dl");
+                            } else if (resobj.succ == 1041 || resobj.succ == 1042) {
+                                show.show("#vip_album");
+                                $("#vip_album .album_renewal").hide();
+                                $("#vip_album .album_tips").text(resobj.msg);
+                            }
+                        },
+                        error: function (err) {
+                            console.log(err);
+                        }
+                    });
+                    event.stopPropagation();
+                });
+            }
+            event.stopPropagation();
+        });
+
+        $('input[name="send_validate_code"]').on("click", function (event) {
+            var validate_code = $('input[name="validate_code"]').val();
+            var albumId = $(".album_download_btn").attr("data-id");
+            var durl = '/index.php/album/do_download_album/' + albumId;
+            //$('#da').val(validate_code);
+            $("#download_album_form").ajaxSubmit({
+                url: durl + '?vdcode=' + validate_code,
+                //dataType:'json',
+                type: 'get',
+                dataType: 'jsonp',
+                jsonpcallback: 'jsonpcallback',
+                success: function (resobj) {
+                    if (resobj.succ == 1000) {
+                        window.location = resobj.msg;
+                        securityHide.securityHide();
+                        hide.hide(".dl_popup");
+                    } else if (resobj.succ == 1012) {
+                        $("#pop_validate_code_error").show();
+                    } else if (resobj.succ == 1031) {
+                        hide.hide("#dl_security");
+                        show.show("#dl_noEnoughJiFen");
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+            event.stopPropagation();
+        });
+
+
+
+        $('input[name="validate_code_detail"]').on("focus", function () {
+            $("#pop_validate_code_error_dl").hide();
+        });
+
+        $('input[name="validate_code"]').on("focus", function () {
+            $("#pop_validate_code_error").hide();
+        });
+        $("#imgValidcode").on("click", function (event) {
+            $(this).attr("src", "/index.php/rest/tools/validcode/album_ip_validate/1" + Math.random());
+
+            event.stopPropagation();
+        });
+        $("#imgValidcode_dl").on("click", function (event) {
+
+            $(this).attr("src", "/index.php/rest/tools/validcode/source_ip_validate/1" + Math.random());
+            event.stopPropagation();
+        });
+
+
+        //评论回复
+        $(".respond_btn").on("click", function (e) {
+            $(this).parents(".rightLi").children(".respond_box").show();
+            e.stopPropagation();
+        });
+        $(".cancel_res").on("click", function (e) {
+            $(this).parents(".res_b").siblings(".res_area").val("");
+            $(this).parents(".respond_box").hide();
+            e.stopPropagation();
+        });
+
+
+
+
+
+    };
+
+
+    return {
+        init: init
+    };
+});
+
+
+

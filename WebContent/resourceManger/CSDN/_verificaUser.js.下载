@@ -1,0 +1,19 @@
+// _verificaUser
+define(['apps/_getCookieValue'], function (_getCookieValue) {
+    var _verificaUser = function () {
+        if (!(_getCookieValue._getCookieValue('UserName')))
+        {
+            var _url = "https://passport.csdn.net/account/login?from=" + encodeURI(location.href);
+            window.location = _url;
+            return false;
+        } else {
+            return true;
+        }
+    };
+    return {
+        _verificaUser: _verificaUser
+    };
+});
+
+
+

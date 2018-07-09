@@ -1,0 +1,19 @@
+// followMenu
+define(function () {
+    var init = function () {
+        var followWrap = $(".follow_menu_box");
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > 900) {
+                followWrap.show();
+            } else {
+                followWrap.hide();
+            }
+        });
+    };
+    return {
+        init: init
+    };
+});
+
+
+

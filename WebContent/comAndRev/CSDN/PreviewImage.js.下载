@@ -1,0 +1,37 @@
+// PreviewImage: Preview images
+define(function () {
+    var PreviewImage = function (obj, imgPreviewId, form) {
+        var allowExtention = "jpg,gif,png"; //,允许上传文件的后缀名
+        var extention = obj.value.substring(obj.value.lastIndexOf(".") + 1).toLowerCase();
+        var browserVersion = window.navigator.userAgent.toUpperCase();
+        var url = 'http://download.csdn.net/index.php/sources_album/getalbumimg';
+
+        var $img = $(imgPreviewId);
+
+        if (allowExtention.indexOf(extention) > -1) {
+            $(form).ajaxSubmit({
+                url: url,
+                data: {
+                    imagesrc: obj.value
+                },
+                dataType: 'json',
+                success: function (dt) {
+                    (dt.succ !== 0) ? $img.attr('src', dt.url) : alert(dt.errmsg);
+                },
+                error: function (err) {
+                    //console.log(err);
+                }
+            });
+        } else {
+            alert("仅支持" + allowSuffix + "为后缀名的文件!");
+            obj.value = ""; //清空选中文件
+        }
+    };
+    return {
+        PreviewImage: PreviewImage
+    };
+});
+
+
+
+

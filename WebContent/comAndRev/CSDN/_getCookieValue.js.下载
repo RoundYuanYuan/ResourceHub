@@ -1,0 +1,14 @@
+// _getCookieValue
+define(function () {
+    var _getCookieValue = function (a, b) {
+        b = document.cookie.match('(^|;)\\s*' + a + '\\s*=\\s*([^;]+)');
+        return b ? b.pop() : '';
+        //return '11';  //测试  ''未登录跳转，其他登陆成功
+    };
+    return {
+        _getCookieValue: _getCookieValue
+    };
+});
+
+
+

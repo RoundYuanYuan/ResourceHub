@@ -1,0 +1,46 @@
+// tab
+define(function () {
+    var init = function () {
+        function dTab(btn, con, cur, show) {
+            var aItem = $(btn),
+                    aItemCon = $(con),
+                    aHref = $(".dl_wrap").find("a");
+            aItem.on("click", function () {
+                var method = $(this).find("span").text(), a;
+                if (method == '支付宝支付' || method == '微信支付') {
+                    if (method == '支付宝支付') {
+                        a = '/1';
+                    } else if (method == '微信支付') {
+                        a = '/2';
+                    }
+                    $(this).parents(".dl_wrap").find("a").href = aHref.attr('data-href') + a;
+                    /*for(var i = 0;i<3;i++){
+                     $(this).parents(".dl_wrap").find("a")[i].href = $(aHref[i]).attr('data-href') + a;
+                     }*/
+                }
+
+                $(this).addClass(cur).siblings().removeClass(cur);
+                var index = aItem.index(this);
+                aItemCon.eq(index).addClass(show).siblings(con).removeClass(show);
+            });
+        }
+        dTab(".relate_btn", ".mod_dl_relate", "relate_cur", "mod_dl_show");
+        //下载详情页面的上传者资源
+        dTab(".resource_btn", ".resource_c", "resource_cur", "resource_c_show");
+        //oDownload.Tab(".vip_combo_item","","vip_combo_cur","");
+        //支付方式tab
+        dTab(".payment_btn", ".payment_c", "payment_cur", "payment_c_show");
+        //专辑首页tab
+        dTab(".dl_album_btn", ".dl_album_t_c", "dl_album_cur", "dl_album_c_show");
+        //专辑贡献榜tab
+        dTab(".contri_btn", ".album_contri_c", "contri_cur", "album_contri_c_show");
+        //分类搜索热点资源tab
+        dTab(".source_btn", ".search_list", "hotSource_cur", "searchHot_show");
+    };
+    return {
+        init: init
+    };
+});
+
+
+

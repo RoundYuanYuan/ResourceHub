@@ -1,0 +1,15 @@
+// securityHide  验证证码隐藏
+define(['apps/hide'], function (hide) {
+    var securityHide = function () {
+        $("#pop_validate_code_error").hide();
+        hide.hide("#dl_security");
+        $('input[name="validate_code"]').val('');
+        $("#da").val('');
+    };
+    return {
+        securityHide: securityHide
+    };
+});
+
+
+

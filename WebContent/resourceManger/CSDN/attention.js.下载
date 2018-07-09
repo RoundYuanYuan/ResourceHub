@@ -1,0 +1,46 @@
+// addAttention
+define(['apps/_verificaUser'], function (_verificaUser) {
+    var init = function () {
+
+        var oAttentionBtn = $("#personal_wrap .attention"),
+                userId = $("#personal_wrap .name").text(),
+                attentionUrl = '/index.php/source/do_follow/';
+        oAttentionBtn.on("click", function (event) {
+            var $this = $(this);
+            if (_verificaUser._verificaUser()) {
+                $.ajax({
+                    type: 'get',
+                    url: attentionUrl + userId,
+                    async: false,
+                    //dataType: 'json',
+                    dataType: 'jsonp',
+                    jsonp: 'callback',
+                    success: function (resobj) {
+                        if (resobj.succ == 0) {
+                            alert("关注失败！");
+                        } else if (resobj.succ == -2) {
+                            alert("当前refer不合法，请重试！");
+                        } else if (resobj.succ == -3) {
+                            alert("当前域名错误，请重试！");
+                        } else {
+                            $this.addClass("al_attention").removeClass("attention").text("已关注");
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            event.stopPropagation();
+        });
+
+    };
+
+    return {
+        init: init
+    };
+});
+
+
+

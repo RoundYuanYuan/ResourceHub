@@ -1,0 +1,100 @@
+// download_detail  downloadReport
+define(['apps/_verificaUser', 'apps/show'], function (_verificaUser, show) {
+    var init = function () {
+        var dlReportBtn = $("#download_report"),
+                submitBtn = $("#btn_submit"),
+                sourceID = $(".dl_download").attr("data-id");
+        dlReportBtn.on("click", function (event) {
+            if (_verificaUser._verificaUser()) {
+                reportUrl = '/index.php/report/before_do_report/' + sourceID;
+                $.ajax({
+                    type: 'get',
+                    url: reportUrl,
+                    async: false,
+                    dataType: 'jsonp',
+                    jsonpcallback: 'jsonpcallback',
+                    success: function (resobj) {
+                        if (resobj.succ == 0) {
+                            show.show("#download");
+                            $("#download .download_tips").html(resobj.msg);
+                            $("#download .dl_download_btn").hide();
+                        } else if (resobj.succ == 1) {
+                            show.show("#dlReport");
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
+            event.stopPropagation();
+        });
+        submit_report = function () {
+
+            var $report_type = $("#report_type").val();
+            var $report_description = $("#report_description").val();
+            var num = 0;
+
+            if ($report_type == '请选择类型') {
+                num = num + 1;
+                $("#report_type_error").html("举报原因");
+                return false;
+            } else {
+                $("#report_type_error").html('');
+
+            }
+
+            if ($report_description == '') {
+                num = num + 1;
+                $("#report_description_error").html("描述不能为空");
+                return false;
+            } else {
+                $("#report_description_error").html("");
+
+            }
+            if (num == 0) {
+                xhr = $('#reportform').ajaxSubmit({
+                    dataType: 'json',
+                    beforeSubmit: function (a, f, o) {
+
+                    },
+                    error: function (data, s, e)
+                    {
+                        alert(e);
+                    },
+                    success: function (data) {
+                        if (data.succ == -1) {
+                            alert("请先登录");
+                        }
+
+                        if (data.succ == 1)
+                        {
+                            alert("举报成功");
+                            // $("#tip-off").modal('hide');
+                            //triggerMark( '#tip-off', 'hide' );
+                            return true;
+                        }
+
+                        if (data.succ == 2) {
+                            alert("已举报");
+                        }
+                        // $("#tip-off").modal('hide');
+                        //triggerMark( '#tip-off', 'hide' );
+                        return false;
+                    }
+
+                });
+            }
+        };
+        submitBtn.on("click", function (event) {
+            submit_report();
+            event.stopPropagation();
+        });
+    };
+    return {
+        init: init
+    };
+});
+
+
+

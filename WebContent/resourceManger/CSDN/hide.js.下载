@@ -1,0 +1,14 @@
+// popHide
+define(function () {
+    var hide = function (obj) {
+        $(obj).hide();
+        $("#dlMask").hide();
+    };
+    return {
+        hide: hide
+    };
+});
+
+
+
+

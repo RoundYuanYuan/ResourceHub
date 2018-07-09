@@ -1,0 +1,41 @@
+.ComContext{
+	width:900px;
+	border:1px solid ;
+	height:500px;
+}
+div{
+	border:1px solid #000;
+}
+
+.list{
+  height:150px;
+   width:600px;
+}
+
+.left { float:left;
+		border:1px solid #006;
+   width:60px;
+   height:80px;
+	}
+.lefts{
+	float:left;
+		border:1px solid #006;
+   width:60px;
+}.
+
+.main { float:left;
+		border:1px solid #006;
+   width:350px;}
+.mains{ float:left;
+		border:1px solid #006;
+   width:350px;}
+.rights {
+	 float:right;
+ border:1px solid #006;
+   width:80px;
+ }
+ .right {
+	float:right;
+ border:1px solid #006;
+   width:80px;
+ }

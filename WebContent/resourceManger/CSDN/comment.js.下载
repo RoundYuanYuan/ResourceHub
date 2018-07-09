@@ -1,0 +1,143 @@
+var base_url = (window.location.host.substring(0, 5) == 'local') ? '//local.downloadv3.csdn.net' : '//download.csdn.net';
+base_url = "";
+$(document).ready(function () {
+
+    CC_Comment.initConfig();
+    //CC_Comment.getContent(1);
+});
+var CC_Comment =
+        {
+            sourceid: 0,
+            initConfig: function ()
+            {
+                var sid = parseInt($(".download_comment").attr('sourceid'));
+                if (isNaN(sid) || sid <= 0)
+                {
+                    this.sourceid = 0;
+                } else
+                {
+                    this.sourceid = sid;
+                }
+
+            },
+            showLoading: function (content)
+            {
+                $(".download_comment").html(content);
+            },
+            hideLoading: function ()
+            {
+                $(".download_comment").html("");
+            },
+            getContent: function (pageno)
+            {
+                var self = this;
+
+                $.ajax({
+                    url: '/index.php/comment/get_comment_data/' + this.sourceid + '/' + pageno,
+                    data: '&t=' + (new Date).getTime(),
+                    type: 'GET',
+                    dataType: 'jsonp',
+                    jsonp: 'jsonpcallback',
+                    beforeSend: this.showLoading('正在读取评论内容...'),
+                    success: function (data) {
+                        self.hideLoading();
+                        $(".download_comment").html(data);
+                        $('.cc_comment_msg').hide();
+
+                        //alert(data);
+                    }
+                });
+            },
+            postComment: function ()
+            {
+                var pass = true;
+                var form = $('.cc_comment_form');
+
+                var text = $("#cc_body");
+                var vdcode = $("#txt_validcode");
+                var rating = $("input[name='star']").val();
+
+                var cc_cache_msg = $('#cc_cache_msg').innerHTML;
+                /*
+                 if (text.val()==""){
+                 alert('内容不能为空');
+                 pass = false;
+                 };
+                 */
+                if (text.val().length > 600) {
+                    alert('请精简评论内容后提交');
+                    pass = false;
+                } else if ($("#star").val() == 0)
+                {
+                    alert('请为资源打分');
+                    pass = false;
+                } else if (text.val() == '不少于5个字') {
+                    text.val('');
+                    pass = false;
+                } else if (text.val() == '') {
+                    $('#cc_body_msg').html('输入内容不能为空');
+                    pass = false;
+                } else if (text.val().length > 0 && text.val().replace(/[^\x00-\xff]/g, "**").length < 10) {
+                    $('#cc_body_msg').html('您输入的评论不够5个字');
+                    pass = false;
+                }
+//			else{
+//			$('#cc_body_msg').html('');
+//		}
+                //判断验证码
+                else if (vdcode.val() == "")
+                {
+                    $('#cc_cache_msg').html('请输入验证码');
+                    pass = false;
+                } else if (text.val() != "" && cc_cache_msg == "" && pass) {
+                    if (window.confirm("您确定参与评论，若是垃圾评论，会被扣除一定积分"))
+                    {
+                        pass = true;
+                    } else
+                    {
+                        pass = false;
+                    }
+                }
+                //传验证码的值
+
+
+                if (pass) {
+                    jQuery.ajax({
+                        url: base_url + '/index.php/comment/post_comment',
+                        data: 'sourceid=' + this.sourceid + '&content=' + encodeURIComponent(text.val()) + '&txt_validcode=' + encodeURIComponent(vdcode.val()) + '&rating=' + rating + '&t=' + (new Date).getTime(),
+                        type: 'GET',
+                        dataType: 'jsonp',
+                        jsonp: 'jsonpcallback',
+                        beforeSend: function () {
+                            form.find('input,textarea').attr("disabled", true);
+                        },
+                        error: function (request) {
+                            alert(request.responseText);
+                            form.find('input,textarea').removeAttr('disabled');
+                        },
+                        success: function (data) {
+                            if (data.succ <= 0)
+                            {
+                                alert(data.msg);
+                                form.find('input,textarea').removeAttr('disabled');
+                                if (data.succ == -1)
+                                {
+                                    //redirect login
+                                }
+                            } else
+                            {
+                                $('.cc_comment_form').hide();
+                                $('.cc_comment_msg dd').html('感谢您的评论！您的评论可能要经过一段时间才会显示在本页上。 ');
+                                $('.cc_comment_msg').show();
+                                setTimeout(function () {
+                                    form.find('input,textarea').removeAttr('disabled');
+                                }, 10000);
+                                //
+                            }
+                        }
+                    });
+                }
+
+            }
+
+        }

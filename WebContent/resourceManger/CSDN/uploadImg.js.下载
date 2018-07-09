@@ -1,0 +1,15 @@
+// uploadImg
+define(['apps/PreviewImage'], function (PreviewImage) {
+    var uploadImg = function () {
+        $('#albumform').ajaxForm();
+        $('input[name=imagesrc]').bind('change', function () {
+            PreviewImage.PreviewImage(this, '#imgView', '#albumform');
+        });
+    };
+    return {
+        uploadImg: uploadImg
+    };
+});
+
+
+

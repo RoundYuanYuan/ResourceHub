@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<constant name="struts.multipart.saveDir" value="c:/upload"></constant>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"></constant>
+    <package name="FileUp" namespace="/" extends="struts-default">
+    
+    <action name="upLoadAction" class="edu.nuc.action.FileAction" method="fileUploadMethod">
+    	<param name="savePath">D:/uploadFile</param>
+     	<result name="success">/fileManger/upLoadOk.jsp</result>
+       	<result name="input">/fileManger/UpFile.jsp</result>
+    	<interceptor-ref name="fileUpload">
+     	<param name="MaximumSize">1024000</param>
+     	<!-- <param name="AllowedExtensions">.doc,.jpg,.txt</param>
+     	<param name="AllowedTypes">text/html,application/msword</param>-->
+     	</interceptor-ref>
+       	<interceptor-ref name="defaultStack"></interceptor-ref>
+       	
+    </action>
+    
+	<action name="downLoadAction" class="edu.nuc.action.FileDownAction" method="downLoadMethod">
+	<result type="stream">
+	<param name="inputName">fileInputStream</param>
+	<param name="contentType">${contentType}</param>
+	<param name="contentDisposition">attachment;filename="${fileName}"</param>
+	<param name="bufferSize">102400</param>
+	</result>
+	</action>
+	
+	<action name="queryFileAction" class="edu.nuc.action.QueryFileAction" method="queryFile">
+	<result name="success">/resourceManger/sourceList2.jsp</result>
+	</action>
+	
+	<action name="queryFileOneAction" class="edu.nuc.action.QueryFileOneAction" method="QueryOneFMethod">
+	<result name="success">/comAndRev/sourceList.jsp</result>
+	</action>
+    </package>         
+</struts>

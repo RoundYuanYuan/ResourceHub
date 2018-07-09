@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+  
+    <package name="c" namespace="/" extends="struts-default">
+
+   
+        <action name="CAction" class="action.ComAndRevAction" method="addComment">
+            <result name="Csuccess" type="redirect">/comAndRev/List</result>
+           <result name="input">/comAndRev/error.jsp</result>
+           </action> 
+        <action name="RAction" class="action.ComAndRevAction" method="addRevert">
+            <result name="Rsuccess" type="redirect">List</result>
+            <result name="input">/comAndRev/error.jsp</result>
+           </action> 
+          <action name="List" class="action.ComAndRevAction" method="getAllByPage">
+            <result name="success">/comAndRev/sourceList.jsp
+           </result>
+           <result name="input">/comAndRev/error.jsp</result>
+           </action>   
+          <action name="passs" class="action.PassAction" method="execute">
+                  <result name="success">/comAndRev/pass.jsp
+           </result>
+           <result name="input">/comAndRev/error.jsp</result>
+              
+          </action>
+              <action name="agree" class="action.PassAction" method="YON">
+                  <result type="redirect">passs
+           </result>
+           <result name="input">/comAndRev/error.jsp</result>              
+          </action>
+          <action name="refuse" class="action.PassAction" method="no">
+                  <result type="redirect">passs
+           </result>
+           <result name="input">/comAndRev/error.jsp</result>              
+          </action>
+           </package>
+
+
+</struts>

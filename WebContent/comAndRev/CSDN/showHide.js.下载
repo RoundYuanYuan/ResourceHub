@@ -1,0 +1,25 @@
+// show or hide
+define(function () {
+    var init = function () {
+        var showBtn = $(".unfold"),
+                hideBtn = $(".fold"),
+                hideCon = $(".download_b_hide");
+
+        showBtn.on("click", function () {
+            hideCon.show();
+            hideBtn.show();
+            showBtn.hide();
+        });
+        hideBtn.on("click", function () {
+            hideCon.hide();
+            hideBtn.hide();
+            showBtn.show();
+        });
+    };
+    return {
+        init: init
+    };
+});
+
+
+

@@ -1,0 +1,49 @@
+
+/*
+ * author:liwz
+ * version:v.0.0.1
+ * create_time:2017.01.14
+ * download modify
+ * */
+// (function() {
+requirejs.config({
+    baseUrl: dl_cdn_url + '/js',
+    //baseUrl: '/static/static/js',
+    urlArgs: 'ver=201712281445',
+    paths: {
+        apps: 'apps',
+        libs: 'libs'
+    },
+    shim: {
+        'apps/Download': ['apps/_verificaUser', 'apps/show', 'apps/hide', 'apps/securityHide'],
+        'apps/_verificaUser': ['apps/_getCookieValue'],
+        //'apps/followMenu':['apps/followMenu'],
+        'apps/uploadImg': ['apps/PreviewImage'],
+        //'apps/cateSearch':['apps/oParam','apps/cateAjaxFn','apps/defaultFn'],
+        'apps/praiseFn': ['apps/_verificaUser'],
+        'apps/dlFunc': ['apps/_verificaUser', 'apps/show', 'apps/hide'],
+        'apps/attention': ['apps/_verificaUser'],
+        'apps/dlReport': ['apps/_verificaUser', 'apps/show']
+    },
+    waitSeconds: 0
+});
+
+requirejs(['apps/showHide', 'apps/tab', 'apps/followMenu', 'apps/Download', 'apps/uploadImg', 'apps/praiseFn', 'apps/dlFunc', 'apps/attention', 'apps/dlReport'], function (showHide, dTab, followMenu, Download, uploadImg, praiseFn, dlFunc, attention, dlReport) {
+    showHide.init();
+    dTab.init();
+    followMenu.init();
+    Download.init();
+    uploadImg.uploadImg();
+    //cateSearch.init();
+    praiseFn.init();
+    dlFunc.init();
+    //dlScroll.init();
+    attention.init();
+    dlReport.init();
+    //dlUpld_resource.init();
+});
+
+
+// }).call(this);
+
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+<package name="default" namespace="/" extends="struts-default">
+   	
+<action name="AddUser" class="useraction.UserAction" method="AddUser">
+		   	<result name="success">/userPages/login.jsp</result>
+			<result name="input">/userPages/register.jsp</result>
+		</action>
+		<action name="SelectUser" class="useraction.UserAction" method="SelectUser">
+			<result>/userPages/SelectUser.jsp</result>
+		</action>
+     <action name="DeleteUser" class="useraction.UserAction" method="DeleteUser">
+		    <result type="redirect">SelectUser.action</result>
+		</action>
+		<action name="SelectUserById" class="useraction.UserAction" method="SelectUserById">
+		   	<result>/userPages/EditUser.jsp</result>
+		</action>
+		<action name="EditUser" class="useraction.UserAction" method="EditUser">
+		    <result type="redirect">LoginAction.action</result>
+			<result name="input">/userPages/EditUser.jsp</result>
+		</action>
+		<action name="LoginAction" class="useraction.UserAction" method="LoginUser">
+		    <result name="success">/userPages/index.jsp</result>
+			<result name="error">/userPages/login.jsp</result>
+		
+		</action>
+</package>
+</struts>

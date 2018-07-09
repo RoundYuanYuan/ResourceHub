@@ -1,0 +1,57 @@
+// favorite created by liwz
+define(['apps/_verificaUser', 'apps/show'], function (_verificaUser, show) {
+    var init = function () {
+        var oFavorite = $("#favorite"),
+                favoUrl = "/index.php/favorite/do_favorite?sourceId=",
+                sourceId = $("#download_top").attr("data-id"),
+                oPopFav = $("#dl_lock .sec_pop_t"),
+                favCountWrap = $("#favorite em i"),
+                favCount = parseInt(favCountWrap.text());
+        oFavorite.on("click", function (event) {
+            var $this = $(this);
+            if (_verificaUser._verificaUser()) {
+                $.ajax({
+                    type: 'get',
+                    url: favoUrl + sourceId,
+                    async: false,
+                    dataType: 'jsonp',
+                    jsonp: 'callback',
+                    success: function (resobj) {
+                        if (resobj.succ == 0) {
+                            show.show("#dl_lock");
+                            oPopFav.html('收藏失败！点击&nbsp;<a href="/my/favs" target="_blank">我的收藏</a>&nbsp;查看收藏的全部资源');
+                        } else if (resobj.succ == -1) {
+                            show.show("#dl_lock");
+                            oPopFav.html('已收藏！点击&nbsp;<a href="/my/favs" target="_blank">我的收藏</a>&nbsp;查看收藏的全部资源');
+                            oFavorite.find(".fa").addClass("fa-star").removeClass("fa-star-o");
+                            $this.addClass("favoRed");
+                        } else if (resobj.succ == -3) {
+                            show.show("#dl_lock");
+                            oPopFav.html('refer地址错误！');
+                        } else {
+                            show.show("#dl_lock");
+                            oPopFav.html('收藏成功！点击&nbsp;<a href="/my/favs" target="_blank">我的收藏</a>&nbsp;查看收藏的全部资源');
+                            favCountWrap.text(favCount + 1);
+                            oFavorite.find(".fa").addClass("fa-star").removeClass("fa-star-o");
+                            $this.addClass("favoRed");
+                        }
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            event.stopPropagation();
+        })
+
+    };
+
+    return {
+        init: init
+    };
+});
+
+
+

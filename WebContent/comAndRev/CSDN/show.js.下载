@@ -1,0 +1,14 @@
+// popShow
+define(function () {
+    var show = function (obj) {
+        $(obj).show();
+        //$(obj).css('top',$(obj).height()/2);
+        $("#dlMask").show();
+    };
+    return {
+        show: show
+    };
+});
+
+
+

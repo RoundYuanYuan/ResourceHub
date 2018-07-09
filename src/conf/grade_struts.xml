@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true" />
+    <!--<constant name="struts.custom.i18n.resources" value="resource" />-->
+    
+    <package name="default" namespace="/" extends="struts-default"><!-- struts-default默认的空白文件，默认的配置文件 -->
+    <default-action-ref name="booklist"></default-action-ref>
+    	<action name="addGrade" class="action.addAction" method="addGrade">
+    		<result name="input">/gradePages/Success.jsp</result>
+    	</action>
+    	
+    	<action name="vim" class="action.addAction" method="getAllGradeByPage">
+    		<result name="success">/gradePages/showAllGrade.jsp</result>
+    	</action>
+    	
+    	<action name="delete" class="action.addAction" method="deleteGrade">
+    		<result name="success" type="redirect">/vim</result>
+    	</action>
+    	
+    	<action name="getSourceById" class="action.addAction" method="getSourceById">
+    		<result name="success">/gradePages/add.jsp</result>
+    	</action>
+    	
+    	<action name="getAverage" class="action.addAction" method="getAverage">
+    		<result name="success">/gradePages/Average.jsp</result>
+    	</action>
+    </package>
+</struts>
